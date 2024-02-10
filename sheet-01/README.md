@@ -10,7 +10,7 @@ This code implements:
 1. **Constructing Inverted Index:**
     - Execute the script with a file argument to construct the inverted index.
     ```
-    python script.py example.tsv
+    python inverted_index.py example.tsv
     ```
 2. **Keyword Querying:**
     - After constructing the index, the script waits for keyword queries.
