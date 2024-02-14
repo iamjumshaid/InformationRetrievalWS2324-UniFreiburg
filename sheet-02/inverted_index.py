@@ -113,8 +113,8 @@ class InvertedIndex:
             for line in file:
                 doc_id += 1
 
-                # store the doc as a tuple (title, description).
-                title, desc, _ = line.split("\t", 2)
+                # store the doc as a tuple (title, description). <num_ratings>TAB<rating>TAB<num_sitelinks> (adding for improvement)
+                title, desc, num_of_votes, rating, num_site_links = line.split("\t", 5)
                 self.docs.append((title, desc))
 
                 keywords = self.get_keywords(title) + self.get_keywords(desc)

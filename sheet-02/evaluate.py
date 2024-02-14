@@ -9,6 +9,9 @@ Sebastian Walter <swalter@cs.uni-freiburg.de>
 import argparse
 
 from inverted_index import InvertedIndex  # NOQA
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 
 class Evaluate:
@@ -31,10 +34,27 @@ class Evaluate:
         with open(file_name, 'r') as file:
             for line in file:
                 query, ids = line.strip().split('\t', 1)
+                query = self.remove_stopwords(query)
                 # convert string of ids into set of ints
                 result[query] = set(map(int, ids.split()))
         return result
 
+    def remove_stopwords(self, input_line):
+
+        # Tokenize the input line
+        tokens = word_tokenize(input_line)
+
+        # Get English stopwords
+        stop_words = set(stopwords.words('english'))
+
+        # Remove stopwords
+        filtered_tokens = [
+            word for word in tokens if word.lower() not in stop_words]
+
+        # Join the filtered tokens back into a string
+        filtered_line = ' '.join(filtered_tokens)
+
+        return filtered_line
 
     def evaluate(
         self,
@@ -75,7 +95,8 @@ class Evaluate:
 
             map += self.average_precision(result_ids, relevant_ids)
 
-            mp_at_r += self.precision_at_k(result_ids, relevant_ids, len(relevant_ids))
+            mp_at_r += self.precision_at_k(result_ids,
+                                           relevant_ids, len(relevant_ids))
 
         return (mp_at_3 / num_of_queries, mp_at_r / num_of_queries, map / num_of_queries)
 
@@ -111,7 +132,6 @@ class Evaluate:
         intersection = [x for x in result_ids if x in relevant_ids]
         return len(intersection) / k
 
-
     def average_precision(
         self,
         result_ids: list[int],
@@ -137,17 +157,20 @@ class Evaluate:
             return 0.0
 
         # creating sorted list of positions of the relevant documents in the result list
-        r_list = [index + 1 for index, result in enumerate(result_ids) if result in relevant_ids]
+        r_list = [index + 1 for index,
+                  result in enumerate(result_ids) if result in relevant_ids]
 
         # calculating average precision
         total_sum = 0.0
         for r in r_list:
             # finding how many relvant doc at position r
-            no_of_rel_doc = len([i for i in result_ids[:r] if i in relevant_ids])
+            no_of_rel_doc = len(
+                [i for i in result_ids[:r] if i in relevant_ids])
             p_at_r = no_of_rel_doc / r
             total_sum += p_at_r
         ap = total_sum / len(relevant_ids)
         return ap
+
 
 def parse_args() -> argparse.Namespace:
     """
@@ -191,16 +214,22 @@ def main(args: argparse.Namespace) -> None:
     Constructs an inverted index from the given dataset and evaluates the
     inverted index against the given benchmark.
     """
+    k = 0.35
+    b = 0.0
     # create a new inverted index from the given file
     print(f"Reading from file {args.file}")
     ii = InvertedIndex()
-    ii.build_from_file(args.file, args.b_param, args.k_param)
+    ii.build_from_file(args.file, b, k)
 
     evaluator = Evaluate()
     benchmark = evaluator.read_benchmark(args.benchmark)
     measures = evaluator.evaluate(ii, benchmark, use_refinements=False)
     measures = [round(measure, 3) for measure in measures]
-    print(f'MP@3: {measures[0]}, MP@R: {measures[1]}, MAP: {measures[2]}')
+    result = f'Arguments: [k={k}, b={b}]\nMP@3: {measures[0]}, MP@R: {measures[1]}, MAP: {measures[2]}\n'
+    print(result)
+    with open('results.txt', 'a') as f:
+        f.write('-'*30 + '\n')
+        f.write(result + '\n')
 
 
 if __name__ == "__main__":
