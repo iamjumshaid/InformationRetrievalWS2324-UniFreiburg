@@ -1,5 +1,5 @@
 
-# Ranking and Evaluation
+# Database Design and SQLITE3
 
 This exercise is about Database design and practicing simple SQL queries with SQLITE3
 
