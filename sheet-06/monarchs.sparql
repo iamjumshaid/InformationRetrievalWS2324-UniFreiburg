@@ -1,0 +1,17 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX pq: <http://www.wikidata.org/prop/qualifier/>
+PREFIX ps: <http://www.wikidata.org/prop/statement/>
+PREFIX p: <http://www.wikidata.org/prop/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?monarch ?name ?start_time ?end_time  WHERE {
+  ?monarch p:P39 ?monarch_position_held .
+  ?monarch_position_held ps:P39 ?position_held .
+  ?position_held wdt:P361 wd:Q645968 .
+  ?monarch_position_held pq:P580 ?start_time .
+  ?monarch_position_held pq:P582 ?end_time .
+  ?monarch rdfs:label ?name
+}
+ORDER BY DESC(?end_time)

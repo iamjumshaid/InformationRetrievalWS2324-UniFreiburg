@@ -1,0 +1,9 @@
+SELECT ?ceo ?gender ?birth_date WHERE {
+  ?company <chief_executive_officer> ?ceo .
+  ?ceo <place_of_birth> ?place .
+  ?place <country> <United_States> .
+  ?ceo <date_of_birth> ?birth_date .
+  ?ceo <sex_or_gender> ?gender
+}
+ORDER BY DESC(?birth_date)
+LIMIT 10
