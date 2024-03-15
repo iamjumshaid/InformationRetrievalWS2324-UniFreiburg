@@ -1,0 +1,3 @@
+name	score	synonyms	description	some_other_info
+frei	3	fre;fri	first entity	used for doctests
+brei	2	bre;bri	second entity	also for doctests
